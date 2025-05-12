@@ -1,24 +1,29 @@
 <mat-card class="task-card" appearance="outlined">
   <mat-card-header class="card-header">
-    <mat-card-title class="title">Task title</mat-card-title>
+    <mat-card-title class="title">{{task.title}}</mat-card-title>
     <div class="actions">
         <button (click)="openEditDialog()" class="action-button" mat-icon-button matTooltip="Edit task" aria-label="Edit task">
             <mat-icon>edit</mat-icon>
         </button>|
-        <mat-checkbox class="completed" matTooltip="Mark as completed"></mat-checkbox>|
-        <button class="action-button" mat-icon-button matTooltip="Delete task" aria-label="Delete task">
+        <mat-checkbox 
+          class="completed" 
+          matTooltip="Mark as completed"
+          [checked]="task.status === 'completed'"
+          (change)="updateTaskStatus($event.checked)">
+        </mat-checkbox>|
+        <button class="action-button" mat-icon-button matTooltip="Delete task" aria-label="Delete task" (click)="deleteTask()">
             <mat-icon>close</mat-icon>
         </button>
     </div>   
   </mat-card-header>
 
   <mat-card-content>
-    <p>{{longText}}</p>
+    <p>{{task.description}}</p>
   </mat-card-content>
   <mat-card-footer class="task-card-footer">
-    <mat-chip-set aria-label="Chihuahua traits">
-      <mat-chip>Not started</mat-chip>
+    <mat-chip-set aria-label="task status">
+      <mat-chip>{{task.status}}</mat-chip>
     </mat-chip-set>
-    <span>Due date: 21/12/2025</span>
+    <span>Due date: {{task.dueDate | date: 'dd/MM/yyyy'}}</span>
   </mat-card-footer>
 </mat-card>

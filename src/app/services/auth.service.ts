@@ -1,7 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap } from 'rxjs';
 import { AuthResponse } from '../interfaces/AuthResponse';
+import { isPlatformBrowser } from '@angular/common';
 
 @Injectable({
   providedIn: 'root'
@@ -9,42 +10,58 @@ import { AuthResponse } from '../interfaces/AuthResponse';
 export class AuthService {
   private apiUrl = 'http://localhost:3000/api/auth';
   
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) {}
 
-  // Store token in localStorage after successful login/register
-  private saveToken(token: string): void {
-    localStorage.setItem('token', token);
+  saveToken(token: string): void {
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem('token', token);
+    }
   }
 
-  // Get token from localStorage
   getToken(): string | null {
-    return localStorage.getItem('token');
+    if (isPlatformBrowser(this.platformId)) {
+      return localStorage.getItem('token');
+    }
+    return null;
   }
 
-  // Check if user is logged in
   isLoggedIn(): boolean {
     return !!this.getToken();
   }
 
-  // Register new user
+  login(email: string, password: string): Observable<AuthResponse> {
+    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, {
+      email,
+      password
+    }).pipe(
+      tap((response) => {
+        if (response.token) {
+          this.saveToken(response.token);
+        }
+      })
+    );
+  }
+
   register(name: string, email: string, password: string): Observable<AuthResponse> {
     return this.http.post<AuthResponse>(`${this.apiUrl}/register`, {
       name,
       email,
       password
-    });
+    }).pipe(
+      tap((response) => {
+        if (response.token) {
+          this.saveToken(response.token);
+        }
+      })
+    );
   }
 
-  // Login user
-  login(email: string, password: string): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}/login`, {
-      email,
-      password
-    });
-  }
-
-  // Logout user
   logout(): void {
-    localStorage.removeItem('token');
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.removeItem('token');
+    }
   }
 }
