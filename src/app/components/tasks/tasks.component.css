@@ -1,0 +1,24 @@
+.main-container{
+    display: flex;
+    flex-direction: column;
+    margin: 2rem 8rem;
+    height: 90vh;
+}
+
+.heading{
+    flex-grow: 0.2;
+    text-align: center;
+}
+
+.task-list{
+    flex-grow: 8;
+}
+
+.new-task{
+    flex-grow: 0.2;
+}
+
+.center{
+    display: flex;
+    justify-content: center;
+}
